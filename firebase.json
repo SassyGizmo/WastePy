@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"android":{"default":{"projectId":"wastepy-flutter","appId":"1:618842003886:android:1c25ca6f9e7f801315103f","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"wastepy-flutter","configurations":{"android":"1:618842003886:android:1c25ca6f9e7f801315103f","ios":"1:618842003886:ios:d5400515c442f21f15103f"}}}}}}
