@@ -1,4 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import '../../data/datasources/auth_remote_datasource.dart';
+import '../../data/repositories/auth_repository_impl.dart';
+import '../../domain/usecases/login_usecase.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -130,8 +135,22 @@ class _LoginPageState extends State<LoginPage> {
                                 borderRadius: BorderRadius.circular(60),
                               ),
                             ),
-                            onPressed: () {
-                              print("Iniciando sesión con Firebase...");
+                            onPressed: () async {
+                              // 1. Inicialización manual (Esto luego irá con Inyección de Dependencias)
+                              final dataSource = AuthRemoteDataSourceImpl(FirebaseAuth.instance);
+                              final repository = AuthRepositoryImpl(remoteDataSource: dataSource);
+                              final loginUseCase = LoginUseCase(repository);
+
+                              try {
+                                final user = await loginUseCase.execute(
+                                    _userController.text.trim(),
+                                    _passwordController.text.trim()
+                                );
+                                if (user != null) showCustomToast(context, 'Bienvenido ${user.email}');
+                              } catch (e) {
+                                print("Error: $e");
+                                showCustomToast(context, 'No fue posible iniciar sesión. Intente de nuevo más tarde.');
+                              }
                             },
                             child: Text(
                               isLoginSelected ? 'Ingresar' : 'Registrar',
@@ -264,4 +283,16 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+}
+
+void showCustomToast(BuildContext context, String message) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      backgroundColor: const Color(0xFF2C2C2E),
+      duration: const Duration(seconds: 2),
+    ),
+  );
 }
